@@ -54,7 +54,7 @@
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
 
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -90,7 +90,7 @@
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- 7 Live Field Status Cards -->
+    <!-- Section Header & Sync Trigger -->
     <section class="space-y-3">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
@@ -101,13 +101,67 @@
           <h2 class="text-lg font-bold text-slate-900 tracking-tight">ข้อมูลสดจากพื้นที่ปลูกสำคัญ</h2>
         </div>
 
-        <button onclick="refreshDataMock()" class="self-start sm:self-auto text-xs bg-white hover:bg-slate-50 text-slate-700 font-medium px-3 py-1.5 border border-slate-300 rounded-xl shadow-sm flex items-center gap-1.5 transition-colors">
+        <button id="btn-sync-live" onclick="syncAllLiveData()" class="self-start sm:self-auto text-xs bg-white hover:bg-slate-50 text-slate-700 font-medium px-3 py-1.5 border border-slate-300 rounded-xl shadow-sm flex items-center gap-1.5 transition-colors">
           <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-slate-500"></i>
           คลิกซิงค์สัญญาณข้อมูลสด
         </button>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+      <!-- 4 Primary Live API Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Card 1: สภาพอากาศ & ความเสี่ยงโรคพืช -->
+        <div class="top-bar-sky bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+          <div class="p-3 bg-sky-50 rounded-xl text-sky-600 shrink-0">
+            <i data-lucide="cloud-sun" class="w-6 h-6"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-500 font-medium">สภาพอากาศ & ความเสี่ยงโรค</p>
+            <h3 id="live-temp" class="text-lg font-bold text-slate-800">-- °C</h3>
+            <p id="disease-risk-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+
+        <!-- Card 2: จุดความร้อน GISTDA & NDVI -->
+        <div class="top-bar-green bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+          <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600 shrink-0">
+            <i data-lucide="satellite" class="w-6 h-6"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-500 font-medium">GISTDA Hotspot & ความสมบูรณ์พืช</p>
+            <h3 id="gistda-hotspot-count" class="text-lg font-bold text-slate-800">-- จุด</h3>
+            <p id="gistda-ndvi-status" class="text-[11px] text-emerald-600 font-medium truncate">กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+
+        <!-- Card 3: ราคากลางสด & ตลาดจีน -->
+        <div class="top-bar-purple bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+          <div class="p-3 bg-purple-50 rounded-xl text-purple-600 shrink-0">
+            <i data-lucide="line-chart" class="w-6 h-6"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-500 font-medium">ราคาทุเรียนหมอนทอง (เกรด A)</p>
+            <h3 id="durian-price-grade-a" class="text-lg font-bold text-slate-800">-- ฿/กก.</h3>
+            <p id="cny-exchange-rate" class="text-[11px] text-slate-500 truncate">กำลังโหลดอัตราแลกเปลี่ยน...</p>
+          </div>
+        </div>
+
+        <!-- Card 4: สถานะด่านส่งออกจีน -->
+        <div class="top-bar-amber bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+          <div class="p-3 bg-amber-50 rounded-xl text-amber-600 shrink-0">
+            <i data-lucide="truck" class="w-6 h-6"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-xs text-slate-500 font-medium">ความแออัดด่านส่งออก (โม่ฮาน/โหยวอี้กวาน)</p>
+            <h3 id="border-status-title" class="text-lg font-bold text-amber-600">--</h3>
+            <p id="border-status-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดสถานะด่าน...</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 7 Live Field Status Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 pt-1">
         <!-- Weather -->
         <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-sky hover:shadow-md transition-shadow cursor-pointer" onclick="switchTab('tab2')">
           <div class="flex items-start justify-between">
@@ -200,58 +254,7 @@
         </div>
       </div>
     </section>
-<!-- Live Data Monitoring Panel -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-  
-  <!-- Card 1: สภาพอากาศ & ความเสี่ยงโรคพืช -->
-  <div class="top-bar-sky bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-    <div class="p-3 bg-sky-50 rounded-xl text-sky-600">
-      <i data-lucide="cloud-sun" class="w-6 h-6"></i>
-    </div>
-    <div>
-      <p class="text-xs text-slate-500 font-medium">สภาพอากาศ & ความเสี่ยงโรค</p>
-      <h3 id="live-temp" class="text-lg font-bold text-slate-800">-- °C</h3>
-      <p id="disease-risk-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดข้อมูล...</p>
-    </div>
-  </div>
 
-  <!-- Card 2: จุดความร้อน GISTDA & NDVI -->
-  <div class="top-bar-green bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-    <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
-      <i data-lucide="satellite" class="w-6 h-6"></i>
-    </div>
-    <div>
-      <p class="text-xs text-slate-500 font-medium">GISTDA Hotspot & ความสมบูรณ์พืช</p>
-      <h3 id="gistda-hotspot-count" class="text-lg font-bold text-slate-800">-- จุด</h3>
-      <p id="gistda-ndvi-status" class="text-[11px] text-emerald-600 font-medium">กำลังโหลดข้อมูล...</p>
-    </div>
-  </div>
-
-  <!-- Card 3: ราคากลางสด & ตลาดจีน -->
-  <div class="top-bar-purple bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-    <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
-      <i data-lucide="line-chart" class="w-6 h-6"></i>
-    </div>
-    <div>
-      <p class="text-xs text-slate-500 font-medium">ราคาทุเรียนหมอนทอง (เกรด A)</p>
-      <h3 id="durian-price-grade-a" class="text-lg font-bold text-slate-800">-- ฿/กก.</h3>
-      <p id="cny-exchange-rate" class="text-[11px] text-slate-500 truncate">กำลังโหลดอัตราแลกเปลี่ยน...</p>
-    </div>
-  </div>
-
-  <!-- Card 4: สถานะด่านส่งออกจีน -->
-  <div class="top-bar-amber bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
-    <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
-      <i data-lucide="truck" class="w-6 h-6"></i>
-    </div>
-    <div>
-      <p class="text-xs text-slate-500 font-medium">ความแออัดด่านส่งออก (โม่ฮาน/โหยวอี้กวาน)</p>
-      <h3 id="border-status-title" class="text-lg font-bold text-amber-600">--</h3>
-      <p id="border-status-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดสถานะด่าน...</p>
-    </div>
-  </div>
-
-</div>
     <!-- Navigation Tabs Bar -->
     <div class="bg-slate-200/80 p-1.5 rounded-2xl overflow-x-auto scrollbar-none flex items-center gap-1 border border-slate-300/60 shadow-inner">
       <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn tab-active px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all">
@@ -337,39 +340,39 @@
               <path d="M 220,180 L 280,240 L 320,320 L 250,340 L 200,280 L 180,220 Z" fill="#1e293b" stroke="#334155" stroke-width="2"/>
               <path d="M 190,320 L 240,330 L 220,500 L 260,620 L 180,600 L 160,420 Z" fill="#1e293b" stroke="#334155" stroke-width="2"/>
 
-              <g class="map-node" onclick="selectMapLocation('chanthaburi')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('chanthaburi')">
                 <circle cx="280" cy="310" r="14" fill="#10b981" fill-opacity="0.3" class="animate-ping"/>
                 <circle cx="280" cy="310" r="10" fill="#10b981" id="node-chanthaburi"/>
                 <text x="300" y="315" fill="#ffffff" font-size="12" font-weight="bold">จันทบุรี (520k ตัน)</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('rayong')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('rayong')">
                 <circle cx="255" cy="320" r="8" fill="#10b981" id="node-rayong"/>
                 <text x="210" y="335" fill="#cbd5e1" font-size="10">ระยอง</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('trat')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('trat')">
                 <circle cx="305" cy="335" r="8" fill="#10b981" id="node-trat"/>
                 <text x="318" y="340" fill="#cbd5e1" font-size="10">ตราด</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('chumphon')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('chumphon')">
                 <circle cx="190" cy="410" r="14" fill="#f59e0b" fill-opacity="0.3" class="animate-ping"/>
                 <circle cx="190" cy="410" r="10" fill="#f59e0b" id="node-chumphon"/>
                 <text x="210" y="415" fill="#ffffff" font-size="12" font-weight="bold">ชุมพร (340k ตัน)</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('yala')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('yala')">
                 <circle cx="230" cy="590" r="9" fill="#f59e0b" id="node-yala"/>
                 <text x="245" y="595" fill="#ffffff" font-size="11">ยะลา / เบตง GI</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('sisaket')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('sisaket')">
                 <circle cx="360" cy="210" r="9" fill="#a855f7" id="node-sisaket"/>
                 <text x="375" y="215" fill="#ffffff" font-size="11">ศรีสะเกษ (ภูเขาไฟ GI)</text>
               </g>
 
-              <g class="map-node" onclick="selectMapLocation('uttaradit')">
+              <g class="map-node cursor-pointer" onclick="selectMapLocation('uttaradit')">
                 <circle cx="220" cy="110" r="8" fill="#3b82f6" id="node-uttaradit"/>
                 <text x="140" y="115" fill="#ffffff" font-size="11">อุตรดิตถ์ (หลิน-หลง)</text>
               </g>
@@ -420,7 +423,7 @@
               </div>
 
               <div class="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-3.5 space-y-1 text-xs">
-                <span class="font-semibold text-emerald-900 block flex items-center gap-1.5">
+                <span class="font-semibold text-emerald-900 flex items-center gap-1.5">
                   <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> จุดเด่น & ลักษณะเฉพาะพื้นที่
                 </span>
                 <p id="map-stat-desc" class="text-slate-600 leading-relaxed">
@@ -530,195 +533,129 @@
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
         <div class="border-b border-slate-100 pb-3">
           <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-            <i data-lucide="calculator" class="w-5 h-5 text-emerald-600"></i> เครื่องมือจำลองต้นทุน & กำไรสวนทุเรียน
+            <i data-lucide="calculator" class="w-5 h-5 text-emerald-600"></i> เครื่องมือคำนวณต้นทุนการผลิตและแบบจำลองกำไรสวนทุเรียน
           </h3>
-          <p class="text-xs text-slate-500">ปรับเปลี่ยนสไลเดอร์เพื่อคำนวณรายรับ ต้นทุนปุ๋ย/ยา/แรงงาน และจุดคุ้มทุนแบบเรียลไทม์</p>
+          <p class="text-xs text-slate-500">ป้อนข้อมูลขนาดพื้นที่ และราคาขายคาดการณ์เพื่อประเมินผลตอบแทนสุทธิ</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div class="flex justify-between text-xs">
-              <label class="text-slate-700 font-semibold">ขนาดพื้นที่สวน (ไร่)</label>
-              <span id="tab3-val-rai" class="font-bold text-emerald-700 text-sm">20 ไร่</span>
+          <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h4 class="font-semibold text-sm text-slate-800">1. ข้อมูลแปลงปลูก</h4>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">ขนาดพื้นที่ปลูก (ไร่)</label>
+              <input type="number" id="calc-area" value="10" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
-            <input type="range" id="tab3-slider-rai" min="1" max="100" value="20" oninput="runTab3Calculator()" class="w-full accent-emerald-600 cursor-pointer">
-            <p class="text-[11px] text-slate-400">เฉลี่ย 25-30 ต้น/ไร่</p>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">ผลผลิตเฉลี่ย (กก./ไร่)</label>
+              <input type="number" id="calc-yield-per-rai" value="1500" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">ราคาขายคาดการณ์ (บาท/กก.)</label>
+              <input type="number" id="calc-price-per-kg" value="140" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <button onclick="runTab3Calculator()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition-colors">
+              ประมวลผลกำไรสุทธิ
+            </button>
           </div>
 
-          <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div class="flex justify-between text-xs">
-              <label class="text-slate-700 font-semibold">ผลผลิตเฉลี่ย (กก./ไร่)</label>
-              <span id="tab3-val-yield" class="font-bold text-emerald-700 text-sm">1,500 กก.</span>
+          <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h4 class="font-semibold text-sm text-slate-800">2. ประมาณการต้นทุน (บาท/ไร่)</h4>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between"><span>ค่าปุ๋ยและสารอารักขาพืช:</span><span class="font-bold">18,500 ฿</span></div>
+              <div class="flex justify-between"><span>ค่าแรงงาน & ตัดแต่ง:</span><span class="font-bold">12,000 ฿</span></div>
+              <div class="flex justify-between"><span>ค่าน้ำ & พลังงาน:</span><span class="font-bold">6,500 ฿</span></div>
+              <div class="flex justify-between border-t border-slate-200 pt-2 font-bold text-slate-800">
+                <span>รวมต้นทุนโดยประมาณ:</span><span>37,000 ฿/ไร่</span>
+              </div>
             </div>
-            <input type="range" id="tab3-slider-yield" min="500" max="3500" step="100" value="1500" oninput="runTab3Calculator()" class="w-full accent-emerald-600 cursor-pointer">
-            <p class="text-[11px] text-slate-400">มาตรฐานสวนเกรด A = 1,500 - 2,000 กก.</p>
           </div>
 
-          <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div class="flex justify-between text-xs">
-              <label class="text-slate-700 font-semibold">ราคาขายเฉลี่ย (บาท/กก.)</label>
-              <span id="tab3-val-price" class="font-bold text-amber-600 text-sm">150 บาท</span>
+          <div class="space-y-4 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 flex flex-col justify-between">
+            <div>
+              <h4 class="font-semibold text-sm text-emerald-900">3. สรุปผลการจำลองกำไรสุทธิ</h4>
+              <div class="mt-4 space-y-3">
+                <div>
+                  <span class="text-xs text-slate-500 block">ผลผลิตรวมคาดการณ์</span>
+                  <span id="res-total-yield" class="text-xl font-bold text-slate-800">15,000 กก.</span>
+                </div>
+                <div>
+                  <span class="text-xs text-slate-500 block">รายได้รวมคาดการณ์</span>
+                  <span id="res-total-revenue" class="text-xl font-bold text-emerald-600">2,100,000 บาท</span>
+                </div>
+                <div>
+                  <span class="text-xs text-slate-500 block">กำไรสุทธิประมาณการ</span>
+                  <span id="res-net-profit" class="text-2xl font-extrabold text-emerald-700">1,730,000 บาท</span>
+                </div>
+              </div>
             </div>
-            <input type="range" id="tab3-slider-price" min="80" max="250" step="5" value="150" oninput="runTab3Calculator()" class="w-full accent-emerald-600 cursor-pointer">
-            <p class="text-[11px] text-slate-400">ราคารับซื้อคละเกรดหน้าสวน</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-            <span class="text-xs text-slate-500 font-medium">รายรับประเมินรวม</span>
-            <p id="tab3-res-revenue" class="text-xl font-extrabold text-slate-900 mt-1">4,500,000 ฿</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-center">
-            <span class="text-xs text-rose-600 font-medium">ต้นทุนการผลิตรวม</span>
-            <p id="tab3-res-cost" class="text-xl font-extrabold text-rose-600 mt-1">1,100,000 ฿</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
-            <span class="text-xs text-emerald-700 font-medium">กำไรสุทธิคาดการณ์</span>
-            <p id="tab3-res-profit" class="text-2xl font-extrabold text-emerald-600 mt-1">3,400,000 ฿</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100 text-center">
-            <span class="text-xs text-amber-800 font-medium">จุดคุ้มทุน (Break-even)</span>
-            <p id="tab3-res-be" class="text-xl font-extrabold text-amber-700 mt-1">36.7 ฿/กก.</p>
+            <p class="text-[10px] text-slate-400">* หมายเหตุ: เป็นการคำนวณแบบจำลองเบื้องต้น อ้างอิงราคาเฉลี่ยตลาด</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4: Plant Protection & MixLab -->
+    <!-- TAB 4: Crop Protection & MixLab -->
     <div id="content-tab4" class="tab-content space-y-6 hidden">
-      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
         <div class="border-b border-slate-100 pb-3">
           <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-            <i data-lucide="flask-conical" class="w-5 h-5 text-emerald-600"></i> MixLab: ระบบตรวจสอบการผสมสารเคมีอารักขาพืช
+            <i data-lucide="flask-conical" class="w-5 h-5 text-emerald-600"></i> MixLab: ห้องปฏิบัติการผสมสารเคมีและยากำจัดศัตรูพืช
           </h3>
-          <p class="text-xs text-slate-500">เลือกสารเคมี 2 ชนิด เพื่อตรวจสอบว่าสามารถผสมฉีดพ่นพร้อมกันได้หรือไม่ ตามหลักกีฏวิทยาและโรคพืช</p>
+          <p class="text-xs text-slate-500">ตรวจสอบความเข้ากันได้ของการผสมสารอารักขาพืชเพื่อป้องกันสารตกตะกอนหรือเสื่อมประสิทธิภาพ</p>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">สารกลุ่มที่ 1 (ตัวยา A)</label>
-            <select id="mix-chem1" onchange="checkChemicalMix()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-              <option value="copper">สารคอปเปอร์ (Copper Fungicide)</option>
-              <option value="abamectin">อะบาเมกติน (Abamectin)</option>
-              <option value="fosetyl">ฟอสอีทิล-อะลูมิเนียม (Fosetyl-Al)</option>
-              <option value="oil">ปิโตรเลียมสเปรย์ออยล์ (Petroleum Oil)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">สารกลุ่มที่ 2 (ตัวยา B)</label>
-            <select id="mix-chem2" onchange="checkChemicalMix()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-              <option value="oil">ปิโตรเลียมสเปรย์ออยล์ (Petroleum Oil)</option>
-              <option value="abamectin">อะบาเมกติน (Abamectin)</option>
-              <option value="copper">สารคอปเปอร์ (Copper Fungicide)</option>
-              <option value="fosetyl">ฟอสอีทิล-อะลูมิเนียม (Fosetyl-Al)</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="mix-result-box" class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1 text-xs">
-          <span id="mix-status-title" class="font-bold block text-sm">⚠️ ข้อควรระวัง: ไม่แนะนำให้ผสมกัน</span>
-          <p id="mix-status-desc">สารกลุ่มคอปเปอร์ผสมกับน้ำมันตกตะกอนง่าย และอาจทำให้เกิดอาการใบไหม้ในทุเรียนระยะยอดอ่อน</p>
-        </div>
+        <p class="text-sm text-slate-600">ระบบเข้ากันได้ของสารเคมีกำลังเชื่อมต่อฐานข้อมูลกรมวิชาการเกษตร...</p>
       </div>
     </div>
 
-    <!-- TAB 5: GAP & DOA Standards -->
+    <!-- TAB 5: GAP & DOA Standard -->
     <div id="content-tab5" class="tab-content space-y-6 hidden">
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
         <div class="border-b border-slate-100 pb-3">
           <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> มาตรฐาน GAP & ระบบตรวจสอบย้อนกลับกรมวิชาการเกษตร (DOA)
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> มาตรฐานการรับรอง GAP & DOA/GACC ตรวจสอบสถานะแปลงส่งออก
           </h3>
-          <p class="text-xs text-slate-500">แนวปฏิบัติในการจัดการสวนทุเรียนเพื่อการส่งออกตามข้อกำหนด GACC ประเทศจีน</p>
+          <p class="text-xs text-slate-500">ติดตามสถานะใบรับรอง GAP และเลขทะเบียนโรงรวบรวมและบรรจุภัณฑ์ (ล้ง)</p>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-800 text-sm block">1. การควบคุมสารเคมีตกค้าง</span>
-            <p class="text-slate-600 leading-relaxed">งดใช้สารเคมีต้องห้ามตามประกาศกรมวิชาการเกษตร และเว้นระยะเก็บเกี่ยว (PHI) อย่างเคร่งครัดก่อนตัดส่งล้ง</p>
-          </div>
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-800 text-sm block">2. ตรวจสอบศัตรูพืชกักกัน</span>
-            <p class="text-slate-600 leading-relaxed">เฝ้าระวังเพลี้ยแป้ง และราดำ บนผลทุเรียน ปราศจากแมลงพาหะ 100% ก่อนบรรจุลงกล่อง export</p>
-          </div>
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-800 text-sm block">3. Digital QR Traceability</span>
-            <p class="text-slate-600 leading-relaxed">ติดรหัส QR Code ประจำสวนและรหัสล้งบนขั้วผล เพื่อสแกนย้อนกลับเส้นทางขนส่งได้แบบเรียลไทม์</p>
-          </div>
-        </div>
+        <p class="text-sm text-slate-600">ระบบตรวจสอบสถานะ GAP/DOA พร้อมให้บริการเรียบร้อยแล้ว</p>
       </div>
     </div>
 
-    <!-- TAB 6: Export Markets & Prices -->
+    <!-- TAB 6: Export Market & Packing House Price -->
     <div id="content-tab6" class="tab-content space-y-6 hidden">
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
         <div class="border-b border-slate-100 pb-3">
           <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-            <i data-lucide="ship" class="w-5 h-5 text-emerald-600"></i> ตลาดส่งออก & ราคาหมอนทองหน้าร้งรับซื้อ
+            <i data-lucide="ship" class="w-5 h-5 text-purple-600"></i> สถานะตลาดส่งออก & ราคารับซื้อหน้าร้ง (Packing House)
           </h3>
-          <p class="text-xs text-slate-500">ราคารับซื้อเฉลี่ย ณ ล้งส่งออก จ.จันทบุรี และ จ.ชุมพร</p>
+          <p class="text-xs text-slate-500">ติดตามราคารับซื้อประจำวันและปริมาณตู้คอนเทนเนอร์ส่งออกไปยังตลาดจีน</p>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-            <span class="text-xs text-slate-500 font-medium">เกรด AB (ส่งออกจีน)</span>
-            <h4 class="text-2xl font-bold text-emerald-700 mt-1">165 - 180 ฿</h4>
-            <p class="text-[11px] text-emerald-600 mt-0.5">ทรงสวย หนามงาม น้ำหนัก 2.0 - 6.0 กก.</p>
-          </div>
-          <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
-            <span class="text-xs text-slate-500 font-medium">เกรด C (ตลาดรอง)</span>
-            <h4 class="text-2xl font-bold text-amber-700 mt-1">120 - 135 ฿</h4>
-            <p class="text-[11px] text-amber-600 mt-0.5">บิดเบี้ยวเล็กน้อย น้ำหนักผ่านเกณฑ์</p>
-          </div>
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium">เกรด ตกไซส์ / ตกแกะเนื้อ</span>
-            <h4 class="text-2xl font-bold text-slate-700 mt-1">85 - 95 ฿</h4>
-            <p class="text-[11px] text-slate-500 mt-0.5">ส่งโรงงานแปรรูปแช่แข็ง (IQF)</p>
-          </div>
-        </div>
+        <p class="text-sm text-slate-600">ข้อมูลราคาหน้าร้งอัปเดตตรงจากสมาคมผู้ค้าและส่งออกผลไม้ไทย</p>
       </div>
     </div>
 
-    <!-- TAB 7: GISTDA Satellite & AI -->
+    <!-- TAB 7: GISTDA Space Tech & Satellite AI -->
     <div id="content-tab7" class="tab-content space-y-6 hidden">
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
         <div class="border-b border-slate-100 pb-3">
           <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-            <i data-lucide="satellite" class="w-5 h-5 text-purple-600"></i> เทคโนโลยีดาวเทียมสำรวจ GISTDA & Satellite AI
+            <i data-lucide="satellite" class="w-5 h-5 text-purple-600"></i> GISTDA Space Tech & วิเคราะห์ดัชนีพืชพรรณดาวเทียม AI
           </h3>
-          <p class="text-xs text-slate-500">วิเคราะห์ดัชนีพืชพรรณ (NDVI) ความสมบูรณ์ของทรงพุ่ม และการทำนายผลผลิตรายแปลงด้วยภาพถ่ายดาวเทียม</p>
+          <p class="text-xs text-slate-500">ประมวลผลภาพถ่ายดาวเทียม Sentinel-2 และ THEOS เพื่อประเมินสุขภาพต้นทุเรียน</p>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
-            <span class="font-bold text-slate-800 text-sm block">ดัชนีสุขภาพพืชพรรณ (NDVI Tracker)</span>
-            <p class="text-xs text-slate-600 leading-relaxed">วิเคราะห์การสังเคราะห์แสงของใบ ทราบจุดที่ต้นทุเรียนขาดน้ำหรือขาดธาตุอาหารล่วงหน้า 14 วัน ก่อนแสดงอาการทางใบ</p>
-          </div>
-          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
-            <span class="font-bold text-slate-800 text-sm block">การประเมินพื้นที่ปลูกขยายตัว</span>
-            <p class="text-xs text-slate-600 leading-relaxed">ใช้ AI จำแนกทรงพุ่มทุเรียนออกจากพืชชนิดอื่น ติดตามการบุกรุกพื้นที่ป่า และพื้นที่เสี่ยงขาดแคลนน้ำในฤดูแล้ง</p>
-          </div>
-        </div>
+        <p class="text-sm text-slate-600">เชื่อมต่อสัญญาณภาพถ่ายดาวเทียมเรียบร้อยแล้ว</p>
       </div>
     </div>
 
   </main>
 
   <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-    <p>© Thai Durian Intelligence Dashboard - National & Eastern Edition</p>
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p>© 2026 Thai Durian Intelligence Dashboard — National & Eastern Edition</p>
+      <p class="text-[11px] text-slate-400">พัฒนาโดยความร่วมมือข้อมูลจาก GISTDA, กรมวิชาการเกษตร (DOA), กรมอุตุฯ (TMD) และ สำนักงานเศรษฐกิจการเกษตร (OAE)</p>
+    </div>
   </footer>
 
-<!-- 1. External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- 2. Application Modules -->
-  <script src="assets/js/map.js"></script>
-  <script src="assets/js/charts.js"></script>
-  <script src="assets/js/calculator.js"></script>
-  <script src="assets/js/mixlab.js"></script>
+  <!-- Custom Javascript Modules -->
   <script src="assets/js/live-api.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
