@@ -3,6 +3,11 @@ let chartRegional = null;
 let chartHarvest = null;
 
 function initCharts() {
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js ยังไม่ได้โหลด หรือโหลดไม่สำเร็จ');
+    return;
+  }
+
   // Chart 1: Variety Distribution (Doughnut)
   const ctxVariety = document.getElementById('chart-variety-national')?.getContext('2d');
   if (ctxVariety) {
@@ -92,29 +97,6 @@ function initCharts() {
           x: { grid: { display: false } }
         }
       }
-    });
-  }
-}      data: {
-        labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
-        datasets: [
-          { label: 'ภาคตะวันออก', data: [0, 10, 30, 85, 100, 60, 15, 0, 0, 0, 0, 0], backgroundColor: '#10b981' },
-          { label: 'ภาคใต้', data: [10, 0, 0, 0, 5, 20, 60, 95, 80, 40, 15, 10], backgroundColor: '#f59e0b' }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
-    });
-  }
-
-  // Cost Chart
-  const ctxCost = document.getElementById('chart-cost-breakdown')?.getContext('2d');
-  if (ctxCost) {
-    costChartInstance = new Chart(ctxCost, {
-      type: 'pie',
-      data: {
-        labels: ['ปุ๋ย/ยา/สารเคมี', 'แรงงาน/น้ำ/ไฟ'],
-        datasets: [{ data: [180000, 150000], backgroundColor: ['#f59e0b', '#3b82f6'] }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
     });
   }
 }
