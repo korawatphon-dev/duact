@@ -1,4 +1,4 @@
-// ฟังก์ชันสลับ Tab
+// สลับ Tab
 function switchTab(tabId) {
   const contents = document.querySelectorAll('.tab-content');
   contents.forEach(el => el.classList.add('hidden'));
@@ -10,9 +10,7 @@ function switchTab(tabId) {
   });
 
   const activeContent = document.getElementById(`content-${tabId}`);
-  if (activeContent) {
-    activeContent.classList.remove('hidden');
-  }
+  if (activeContent) activeContent.classList.remove('hidden');
 
   const activeBtn = document.getElementById(`btn-${tabId}`);
   if (activeBtn) {
@@ -21,7 +19,7 @@ function switchTab(tabId) {
   }
 }
 
-// อัปเดตเวลาและวันที่บน Header
+// อัปเดตเวลาบน Header
 function updateClock() {
   const now = new Date();
   const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
@@ -34,28 +32,29 @@ function updateClock() {
   if (dateElem) dateElem.innerText = dateStr;
 }
 
-function refreshDataMock() {
-  alert('ทำการซิงค์สัญญาณข้อมูลสดจาก GISTDA, DOA และ กรมอุตุนิยมวิทยา เรียบร้อยแล้ว!');
-}
-
-// เริ่มการทำงานเมื่อ DOM และไลบรารีภายนอกพร้อม
+// โหลดระบบพร้อมกันเมื่อเบราว์เซอร์พร้อม
 window.addEventListener('load', () => {
-  // Lucide Icons
+  // 1. สร้าง Lucide Icons
   if (window.lucide) {
     lucide.createIcons();
   }
 
-  // เริ่มต้นสร้างกราฟ
+  // 2. สร้างกราฟ
   if (typeof initCharts === 'function') {
     initCharts();
   }
 
-  // คำนวณค่าเครื่องคิดเลข
+  // 3. คำนวณเครื่องคิดเลข
   if (typeof runTab3Calculator === 'function') {
     runTab3Calculator();
   }
 
-  // อัปเดตเวลา
+  // 4. ดึงข้อมูล Live สดทันที (Open-Meteo + Currency + GISTDA)
+  if (typeof syncAllLiveData === 'function') {
+    syncAllLiveData();
+  }
+
+  // 5. เริ่มนับเวลา
   updateClock();
   setInterval(updateClock, 60000);
 });
