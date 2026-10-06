@@ -1,27 +1,88 @@
-const mapLocations = {
+// ข้อมูลสถิติของแต่ละพื้นที่ GIS
+const locationData = {
   chanthaburi: {
-    badge: "ภาคตะวันออก",
-    title: "จันทบุรี",
-    subtitle: "เมืองหลวงทุเรียนไทย",
-    area: "385,000 ไร่",
-    yield: "520,000 ตัน"
+    region: 'ภาคตะวันออก',
+    title: 'จันทบุรี (เมืองหลวงทุเรียนไทย)',
+    subtitle: 'ศูนย์กลางส่งออกทุเรียนใหญ่ที่สุดในเอเชียตะวันออกเฉียงใต้',
+    area: '385,000 ไร่',
+    yield: '520,000 ตัน',
+    gap: '94.8% (28,500 แปลง)',
+    variety: 'หมอนทอง (85%)',
+    desc: 'เนื้อแน่น ละเอียด สีเหลืองทอง รสชาติหวานมัน เข้มข้น เป็นศูนย์รวมล้งส่งออกมาตรฐาน DOA และระบบสแกนย้อนกลับ GACC สู่ด่านจีน'
+  },
+  rayong: {
+    region: 'ภาคตะวันออก',
+    title: 'ระยอง (แหล่งทุเรียนคุณภาพเยี่ยม)',
+    subtitle: 'โดดเด่นด้านรสชาติและคุณภาพเนื้อเกรดพรีเมียม',
+    area: '120,000 ไร่',
+    yield: '160,000 ตัน',
+    gap: '92.1% (9,800 แปลง)',
+    variety: 'หมอนทอง / ชะนี (90%)',
+    desc: 'รสชาติหวานนุ่ม เนื้อแห้ง ไม่ฉ่ำน้ำ เป็นที่ต้องการสูงในตลาดพรีเมียมและผู้บริโภคในประเทศ'
+  },
+  trat: {
+    region: 'ภาคตะวันออก',
+    title: 'ตราด (ทุเรียนออกก่อนฤดู)',
+    subtitle: 'เก็บเกี่ยวได้เร็วที่สุดในภาคตะวันออก สร้างราคาต้นฤดูได้สูง',
+    area: '95,000 ไร่',
+    yield: '130,000 ตัน',
+    gap: '89.5% (7,200 แปลง)',
+    variety: 'หมอนทอง (88%)',
+    desc: 'สภาพอากาศชื้นสัมพัทธ์สูงทำให้ทุเรียนตราดออกดอกและติดผลไวกว่าพื้นที่อื่น ได้ราคาดีช่วงต้นฤดูกาล'
   },
   chumphon: {
-    badge: "ภาคใต้",
-    title: "ชุมพร",
-    subtitle: "ประตูสู่ทุเรียนใต้",
-    area: "260,000 ไร่",
-    yield: "340,000 ตัน"
+    region: 'ภาคใต้',
+    title: 'ชุมพร (ประตูสู่ทุเรียนภาคใต้)',
+    subtitle: 'ศูนย์กลางการรวบรวมและส่งออกทุเรียนใหญ่ที่สุดของภาคใต้',
+    area: '265,000 ไร่',
+    yield: '340,000 ตัน',
+    gap: '87.2% (21,000 แปลง)',
+    variety: 'หมอนทอง (92%)',
+    desc: 'ผลผลิตออกช่วงครึ่งปีหลัง (ก.ค. - ก.ย.) รองรับการส่งออกต่อจากภาคตะวันออก มีล้งรับซื้อขนาดใหญ่รองรับจำนวนมาก'
+  },
+  yala: {
+    region: 'ภาคใต้',
+    title: 'ยะลา / เบตง (ทุเรียนสะเด็ดน้ำ GI)',
+    subtitle: 'เอกลักษณ์ทุเรียนหุบเขา อากาศเย็นหมอกปกคลุม',
+    area: '92,000 ไร่',
+    yield: '110,000 ตัน',
+    gap: '81.4% (6,500 แปลง)',
+    variety: 'หมอนทอง / มูซังคิง / หนามดำ',
+    desc: 'เนื้อละเอียด แห้ง ไม่หวานจัด ได้รับการขึ้นทะเบียนสินค้า GI ทุเรียนสะเด็ดน้ำยะลา เป็นที่นิยมของนักท่องเที่ยว'
+  },
+  sisaket: {
+    region: 'ภาคตะวันออกเฉียงเหนือ',
+    title: 'ศรีสะเกษ (ทุเรียนภูเขาไฟ GI)',
+    subtitle: 'ปลูกบนดินภูเขาไฟโบราณ อุดมด้วยธาตุอาหารธรรมชาติ',
+    area: '18,500 ไร่',
+    yield: '25,000 ตัน',
+    gap: '95.0% (1,800 แปลง)',
+    variety: 'หมอนทอง (95%)',
+    desc: 'เนื้อกรอบนอกนุ่มใน หวานมัน กลิ่นไม่แรง ไม่ติดฟัน ได้รับความนิยมสูงมากในตลาดภายในประเทศ'
+  },
+  uttaradit: {
+    region: 'ภาคเหนือ',
+    title: 'อุตรดิตถ์ (หลิน-หลง ลับแล GI)',
+    subtitle: 'ทุเรียนสายพันธุ์พื้นเมืองระดับตำนานแห่งเมืองลับแล',
+    area: '22,000 ไร่',
+    yield: '18,000 ตัน',
+    gap: '88.0% (1,500 แปลง)',
+    variety: 'หลงลับแล / หลินลับแล',
+    desc: 'ผลขนาดเล็ก เมล็ดลีบ เนื้อละเอียดเนียน รสชาติหวานมันกลมกล่อม มีราคาสูงและเป็นสินค้าเฉพาะกลุ่ม'
   }
 };
 
+// ฟังก์ชันเปลี่ยนข้อมูลเมื่อคลิกบนแผนที่
 function selectMapLocation(key) {
-  const data = mapLocations[key];
+  const data = locationData[key];
   if (!data) return;
 
-  document.getElementById('map-region-badge').innerText = data.badge;
+  document.getElementById('map-region-badge').innerText = data.region;
   document.getElementById('map-region-title').innerText = data.title;
   document.getElementById('map-region-subtitle').innerText = data.subtitle;
   document.getElementById('map-stat-area').innerText = data.area;
   document.getElementById('map-stat-yield').innerText = data.yield;
+  document.getElementById('map-stat-gap').innerText = data.gap;
+  document.getElementById('map-stat-variety').innerText = data.variety;
+  document.getElementById('map-stat-desc').innerText = data.desc;
 }
