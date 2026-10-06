@@ -8,9 +8,10 @@ function initCharts() {
     return;
   }
 
-  // Chart 1: Variety Distribution (Doughnut)
+  // Chart 1: Variety Distribution
   const ctxVariety = document.getElementById('chart-variety-national')?.getContext('2d');
   if (ctxVariety) {
+    if (chartVariety) chartVariety.destroy();
     chartVariety = new Chart(ctxVariety, {
       type: 'doughnut',
       data: {
@@ -32,9 +33,10 @@ function initCharts() {
     });
   }
 
-  // Chart 2: Regional Yield (Bar)
+  // Chart 2: Regional Yield
   const ctxRegional = document.getElementById('chart-regional-yield')?.getContext('2d');
   if (ctxRegional) {
+    if (chartRegional) chartRegional.destroy();
     chartRegional = new Chart(ctxRegional, {
       type: 'bar',
       data: {
@@ -49,9 +51,7 @@ function initCharts() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
+        plugins: { legend: { display: false } },
         scales: {
           y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
           x: { grid: { display: false } }
@@ -60,9 +60,10 @@ function initCharts() {
     });
   }
 
-  // Chart 3: Harvest Calendar (Line)
+  // Chart 3: Harvest Calendar
   const ctxHarvest = document.getElementById('chart-harvest-season')?.getContext('2d');
   if (ctxHarvest) {
+    if (chartHarvest) chartHarvest.destroy();
     chartHarvest = new Chart(ctxHarvest, {
       type: 'line',
       data: {
