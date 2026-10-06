@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="th" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thai Durian Intelligence Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#16a34a', 600: '#15803d', 700: '#166534', accent: '#f59e0b' }
+          },
+          fontFamily: { sans: ['Prompt', 'Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-amber-500 flex items-center justify-center text-white font-bold text-xl shadow-md">🌳</div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg text-emerald-950 tracking-tight leading-tight flex items-center gap-2">
+            Thai Durian Intelligence Dashboard
+            <span class="text-xs bg-amber-100 text-amber-900 font-semibold px-2.5 py-0.5 rounded-full border border-amber-300 hidden sm:inline-block">National & Eastern Edition</span>
+          </h1>
+          <p class="text-xs text-slate-500 hidden sm:block">ศูนย์รวมข้อมูลสภาพอากาศ คุณภาพอากาศ และสถิติทุเรียนไทย</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="hidden lg:flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600">
+          <i data-lucide="refresh-cw" id="sync-spinner" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span id="sync-status">ซิงค์ข้อมูล Real-time API</span>
+        </div>
+        <div class="text-xs text-right hidden sm:block">
+          <p class="font-medium text-slate-700" id="current-time-str">--:-- น.</p>
+          <p class="text-slate-400 text-[11px]" id="current-date-str">-- --- ----</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Real-Time Metrics Grid -->
+    <section class="space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-0.5 rounded-full text-xs font-semibold mb-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            เชื่อมต่อ Open-Meteo & WAQI API
+          </div>
+          <h2 class="text-lg font-bold text-slate-900 tracking-tight">ข้อมูลสดจากพื้นที่ปลูกสำคัญ (จันทบุรี)</h2>
+        </div>
+        <button onclick="fetchRealtimeAPIs()" class="self-start sm:self-auto text-xs bg-white hover:bg-slate-50 text-slate-700 font-medium px-3 py-1.5 border border-slate-300 rounded-xl shadow-sm flex items-center gap-1.5 transition-colors">
+          <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-slate-500"></i>
+          คลิกรีเฟรช API
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <!-- Weather (Real API) -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-sky">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-sky-50 flex items-center justify-center text-sky-500"><i data-lucide="cloud-rain" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">อุณหภูมิ จันทบุรี</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-0.5" id="api-temp">-- °C</h3>
+            <p class="text-[10px] text-slate-500 mt-0.5 truncate" id="api-humidity">ความชื้น: --%</p>
+          </div>
+        </div>
+
+        <!-- PM2.5 (Real API) -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-green">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="heart-pulse" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">คุณภาพอากาศ (AQI)</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-0.5" id="api-aqi">--</h3>
+            <p class="text-[10px] text-emerald-600 font-medium mt-0.5" id="api-pm25">PM2.5: -- µg/m³</p>
+          </div>
+        </div>
+
+        <!-- Rain Volume (Real API) -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-blue">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i data-lucide="droplet" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">ปริมาณฝนสะสม</p>
+            <h3 class="text-lg font-bold text-blue-600 mt-0.5" id="api-rain">-- mm</h3>
+            <p class="text-[10px] text-slate-500 mt-0.5 truncate">วัดในรอบ 24 ชม.</p>
+          </div>
+        </div>
+
+        <!-- Fuel Price (Benchmark) -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-purple">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-purple-50 flex items-center justify-center text-purple-600"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">ราคาน้ำมันดีเซล B20</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-0.5">31.45 <span class="text-[10px] font-normal text-slate-400">฿</span></h3>
+            <p class="text-[10px] text-slate-500 mt-0.5 truncate">อ้างอิงสถานีขนส่ง</p>
+          </div>
+        </div>
+
+        <!-- Soil Moisture (Real API) -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-lime">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-lime-50 flex items-center justify-center text-lime-600"><i data-lucide="sprout" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">ความชื้นผิวดิน (0-7cm)</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-0.5" id="api-soil-moisture">-- m³/m³</h3>
+            <p class="text-[10px] text-lime-700 font-medium mt-0.5 truncate">ประเมินจากดาวเทียม</p>
+          </div>
+        </div>
+
+        <!-- Fertilizer Price -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-amber">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-amber-50 flex items-center justify-center text-amber-600"><i data-lucide="flask-conical" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">ราคาปุ๋ยเคมี 46-0-0</p>
+            <h3 class="text-lg font-bold text-slate-800 mt-0.5">1,180 <span class="text-[10px] font-normal text-slate-400">฿</span></h3>
+            <p class="text-[10px] text-amber-700 mt-0.5 truncate">ทรงตัว ตลาดตะวันออก</p>
+          </div>
+        </div>
+
+        <!-- Hotspots -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 top-bar-rose">
+          <div class="flex items-start justify-between">
+            <div class="w-7 h-7 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i data-lucide="flame" class="w-4 h-4"></i></div>
+          </div>
+          <div class="mt-2">
+            <p class="text-[11px] text-slate-500 font-medium">จุดความร้อน VIIRS</p>
+            <h3 class="text-lg font-bold text-emerald-600 mt-0.5">0 <span class="text-[10px] font-normal text-slate-400">จุด</span></h3>
+            <p class="text-[10px] text-emerald-600 mt-0.5 truncate">ปลอดภัยในเขตสวน</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-200/80 p-1.5 rounded-2xl overflow-x-auto flex items-center gap-1 border border-slate-300/60 shadow-inner">
+      <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn tab-active px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all"><i data-lucide="map" class="w-4 h-4"></i> 1. ภาพรวมประเทศ & แผนที่ GIS</button>
+      <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn tab-inactive px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all"><i data-lucide="cloud-lightning" class="w-4 h-4"></i> 2. ปฏิทินเก็บเกี่ยว</button>
+      <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn tab-inactive px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all"><i data-lucide="calculator" class="w-4 h-4"></i> 3. จำลองกำไร</button>
+      <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn tab-inactive px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all"><i data-lucide="flask-conical" class="w-4 h-4"></i> 4. MixLab ผสมสารเคมี</button>
+    </div>
+
+    <!-- TAB 1 -->
+    <div id="content-tab1" class="tab-content space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-emerald-600"></i> แผนที่จำลอง GIS แหล่งปลูกสำคัญ</h3>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Vector GIS</span>
+          </div>
+          <div class="relative bg-slate-900 rounded-2xl p-4 min-h-[380px] flex items-center justify-center overflow-hidden border border-slate-800">
+            <svg viewBox="0 0 500 700" class="w-full h-full max-h-[380px] relative z-10">
+              <path d="M 180,60 L 250,50 L 290,120 L 220,180 Z" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+              <g class="map-node" onclick="selectMapLocation('chanthaburi')">
+                <circle cx="280" cy="310" r="14" fill="#10b981" fill-opacity="0.3" class="animate-ping"/>
+                <circle cx="280" cy="310" r="10" fill="#10b981"/>
+                <text x="300" y="315" fill="#ffffff" font-size="12" font-weight="bold">จันทบุรี</text>
+              </g>
+              <g class="map-node" onclick="selectMapLocation('chumphon')">
+                <circle cx="190" cy="410" r="10" fill="#f59e0b"/>
+                <text x="210" y="415" fill="#ffffff" font-size="12" font-weight="bold">ชุมพร</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+          <div class="border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-emerald-600"></i> รายละเอียดพื้นที่สถิติ</h3>
+            <span id="map-region-badge" class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full">ภาคตะวันออก</span>
+          </div>
+          <div>
+            <h4 id="map-region-title" class="text-xl font-bold text-slate-800">จันทบุรี</h4>
+            <p id="map-region-subtitle" class="text-xs text-slate-500 mt-0.5">เมืองหลวงทุเรียนไทย</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200"><span class="text-slate-400 block">พื้นที่ปลูก</span><span id="map-stat-area" class="font-bold text-slate-800">385,000 ไร่</span></div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200"><span class="text-slate-400 block">ผลผลิต</span><span id="map-stat-yield" class="font-bold text-amber-600">520,000 ตัน</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+          <h3 class="font-bold text-slate-900 text-base">สัดส่วนสายพันธุ์ทุเรียน</h3>
+          <div class="h-56"><canvas id="chart-variety-national"></canvas></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+          <h3 class="font-bold text-slate-900 text-base">ผลผลิตจำแนกตามภาค (พันตัน)</h3>
+          <div class="h-56"><canvas id="chart-regional-yield"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div id="content-tab2" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 text-base">ปฏิทินผลผลิตทุเรียนรายภูมิภาค (Harvesting Season)</h3>
+        <div class="h-64"><canvas id="chart-harvest-calendar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TAB 3 -->
+    <div id="content-tab3" class="tab-content space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+          <h3 class="font-bold text-slate-900 text-base">จำลองคำนวณกำไรสุทธิ</h3>
+          <div class="space-y-3 text-xs">
+            <div><label class="font-semibold text-slate-700 block mb-1">พื้นที่ (ไร่)</label><input type="number" id="calc-area" value="10" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-bold"></div>
+            <div><label class="font-semibold text-slate-700 block mb-1">ผลผลิต/ไร่ (กก.)</label><input type="number" id="calc-yield-per-rai" value="1500" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-bold"></div>
+            <div><label class="font-semibold text-slate-700 block mb-1">ราคาขาย (บาท/กก.)</label><input type="number" id="calc-price" value="150" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-bold"></div>
+            <button onclick="calculateProfitability()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow-sm text-xs">คำนวณผลตอบแทน</button>
+          </div>
+        </div>
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+          <h3 class="font-bold text-slate-900 text-base">สรุปตัวเลขประมาณการ</h3>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200"><span class="text-xs text-slate-500 block">รายได้รวม</span><span id="res-total-revenue" class="text-lg font-bold text-slate-800">0</span> บาท</div>
+            <div class="bg-rose-50 p-3 rounded-xl border border-rose-200"><span class="text-xs text-rose-700 block">ต้นทุนรวม</span><span id="res-total-cost" class="text-lg font-bold text-rose-600">0</span> บาท</div>
+            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200"><span class="text-xs text-emerald-800 block">กำไรสุทธิ</span><span id="res-net-profit" class="text-lg font-bold text-emerald-600">0</span> บาท</div>
+          </div>
+          <div class="h-44"><canvas id="chart-cost-breakdown"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4 -->
+    <div id="content-tab4" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4">
+        <h3 class="font-bold text-slate-900 text-base">MixLab: ตรวจสอบการผสมสารเคมีเกษตร</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">สาร A</label>
+            <select id="chem-a" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium">
+              <option value="copper">สารประกอบทองแดง (Copper)</option>
+              <option value="sulfur">กำมะถันผง (Sulfur)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">สาร B</label>
+            <select id="chem-b" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium">
+              <option value="calcium_boron">แคลเซียม-โบรอน</option>
+              <option value="oil">ปิโตรเลียมออยล์</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="checkChemicalMix()" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs">ตรวจสอบ</button>
+        <div id="chem-result-box" class="p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+          <p class="font-bold text-slate-800" id="chem-result-title">เลือกสารแล้วกดตรวจสอบ</p>
+          <p class="text-slate-600" id="chem-result-detail">--</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/map.js"></script>
+  <script src="assets/js/calculator.js"></script>
+  <script src="assets/js/mixlab.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

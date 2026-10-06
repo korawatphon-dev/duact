@@ -1,0 +1,45 @@
+body {
+  font-family: 'Prompt', sans-serif;
+  background-color: #f8fafc;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.top-bar-sky { border-top: 4px solid #0284c7; }
+.top-bar-green { border-top: 4px solid #10b981; }
+.top-bar-purple { border-top: 4px solid #a855f7; }
+.top-bar-lime { border-top: 4px solid #84cc16; }
+.top-bar-blue { border-top: 4px solid #3b82f6; }
+.top-bar-amber { border-top: 4px solid #f59e0b; }
+.top-bar-rose { border-top: 4px solid #f43f5e; }
+
+.tab-active {
+  background-color: #ffffff;
+  color: #065f46;
+  font-weight: 700;
+  border-bottom: 3px solid #10b981;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+.tab-inactive {
+  color: #64748b;
+  font-weight: 500;
+}
+.tab-inactive:hover {
+  color: #1e293b;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+.map-node {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+.map-node:hover {
+  transform: scale(1.08);
+}
