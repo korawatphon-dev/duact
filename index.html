@@ -200,7 +200,58 @@
         </div>
       </div>
     </section>
+<!-- Live Data Monitoring Panel -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  
+  <!-- Card 1: สภาพอากาศ & ความเสี่ยงโรคพืช -->
+  <div class="top-bar-sky bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+    <div class="p-3 bg-sky-50 rounded-xl text-sky-600">
+      <i data-lucide="cloud-sun" class="w-6 h-6"></i>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 font-medium">สภาพอากาศ & ความเสี่ยงโรค</p>
+      <h3 id="live-temp" class="text-lg font-bold text-slate-800">-- °C</h3>
+      <p id="disease-risk-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
 
+  <!-- Card 2: จุดความร้อน GISTDA & NDVI -->
+  <div class="top-bar-green bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+    <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+      <i data-lucide="satellite" class="w-6 h-6"></i>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 font-medium">GISTDA Hotspot & ความสมบูรณ์พืช</p>
+      <h3 id="gistda-hotspot-count" class="text-lg font-bold text-slate-800">-- จุด</h3>
+      <p id="gistda-ndvi-status" class="text-[11px] text-emerald-600 font-medium">กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
+
+  <!-- Card 3: ราคากลางสด & ตลาดจีน -->
+  <div class="top-bar-purple bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+    <div class="p-3 bg-purple-50 rounded-xl text-purple-600">
+      <i data-lucide="line-chart" class="w-6 h-6"></i>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 font-medium">ราคาทุเรียนหมอนทอง (เกรด A)</p>
+      <h3 id="durian-price-grade-a" class="text-lg font-bold text-slate-800">-- ฿/กก.</h3>
+      <p id="cny-exchange-rate" class="text-[11px] text-slate-500 truncate">กำลังโหลดอัตราแลกเปลี่ยน...</p>
+    </div>
+  </div>
+
+  <!-- Card 4: สถานะด่านส่งออกจีน -->
+  <div class="top-bar-amber bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+    <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+      <i data-lucide="truck" class="w-6 h-6"></i>
+    </div>
+    <div>
+      <p class="text-xs text-slate-500 font-medium">ความแออัดด่านส่งออก (โม่ฮาน/โหยวอี้กวาน)</p>
+      <h3 id="border-status-title" class="text-lg font-bold text-amber-600">--</h3>
+      <p id="border-status-desc" class="text-[11px] text-slate-500 truncate">กำลังโหลดสถานะด่าน...</p>
+    </div>
+  </div>
+
+</div>
     <!-- Navigation Tabs Bar -->
     <div class="bg-slate-200/80 p-1.5 rounded-2xl overflow-x-auto scrollbar-none flex items-center gap-1 border border-slate-300/60 shadow-inner">
       <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn tab-active px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap transition-all">
