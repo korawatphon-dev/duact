@@ -1,40 +1,100 @@
-let costChartInstance = null;
+let chartVariety = null;
+let chartRegional = null;
+let chartHarvest = null;
 
 function initCharts() {
-  const defaultFont = { family: 'Prompt', size: 11 };
-
-  // Variety Chart
+  // Chart 1: Variety Distribution (Doughnut)
   const ctxVariety = document.getElementById('chart-variety-national')?.getContext('2d');
   if (ctxVariety) {
-    new Chart(ctxVariety, {
+    chartVariety = new Chart(ctxVariety, {
       type: 'doughnut',
       data: {
-        labels: ['หมอนทอง', 'ชะนี', 'ก้านยาว', 'พวงมณี', 'อื่นๆ'],
-        datasets: [{ data: [78, 10, 5, 4, 3], backgroundColor: ['#10b981', '#f59e0b', '#a855f7', '#3b82f6', '#cbd5e1'] }]
+        labels: ['หมอนทอง', 'ชะนี', 'พวงมณี', 'ก้านยาว', 'อื่นๆ / สายพันธุ์ GI'],
+        datasets: [{
+          data: [82, 8, 4, 3, 3],
+          backgroundColor: ['#10b981', '#f59e0b', '#a855f7', '#3b82f6', '#94a3b8'],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
       },
-      options: { responsive: true, maintainAspectRatio: false }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 11 } } }
+        }
+      }
     });
   }
 
-  // Regional Chart
+  // Chart 2: Regional Yield (Bar)
   const ctxRegional = document.getElementById('chart-regional-yield')?.getContext('2d');
   if (ctxRegional) {
-    new Chart(ctxRegional, {
+    chartRegional = new Chart(ctxRegional, {
       type: 'bar',
       data: {
-        labels: ['ตะวันออก', 'ใต้', 'อีสาน', 'เหนือ'],
-        datasets: [{ label: 'ผลผลิต (พันตัน)', data: [785, 620, 110, 65], backgroundColor: '#10b981', borderRadius: 6 }]
+        labels: ['ภาคตะวันออก', 'ภาคใต้', 'ภาคตะวันออกเฉียงเหนือ', 'ภาคเหนือ'],
+        datasets: [{
+          label: 'ปริมาณผลผลิต (พันตัน)',
+          data: [790, 600, 110, 80],
+          backgroundColor: ['#10b981', '#f59e0b', '#a855f7', '#3b82f6'],
+          borderRadius: 8
+        }]
       },
-      options: { responsive: true, maintainAspectRatio: false }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+          x: { grid: { display: false } }
+        }
+      }
     });
   }
 
-  // Harvest Chart
-  const ctxHarvest = document.getElementById('chart-harvest-calendar')?.getContext('2d');
+  // Chart 3: Harvest Calendar (Line)
+  const ctxHarvest = document.getElementById('chart-harvest-season')?.getContext('2d');
   if (ctxHarvest) {
-    new Chart(ctxHarvest, {
-      type: 'bar',
+    chartHarvest = new Chart(ctxHarvest, {
+      type: 'line',
       data: {
+        labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+        datasets: [
+          {
+            label: 'ภาคตะวันออก',
+            data: [5, 15, 60, 220, 310, 150, 30, 0, 0, 0, 0, 0],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'ภาคใต้',
+            data: [0, 0, 0, 10, 30, 80, 210, 180, 80, 10, 0, 0],
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            fill: true,
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Prompt', size: 11 } } }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+}      data: {
         labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
         datasets: [
           { label: 'ภาคตะวันออก', data: [0, 10, 30, 85, 100, 60, 15, 0, 0, 0, 0, 0], backgroundColor: '#10b981' },
