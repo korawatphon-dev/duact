@@ -3,22 +3,14 @@
  * assets/js/app.js
  */
 
-// Global Chart Instances
 let chartVariety = null;
 let chartRegional = null;
 let chartHarvest = null;
 
-// ==========================================
-// 1. Navigation & UI Controls
-// ==========================================
-
-// สลับ Tab
+// 1. Navigation & Clock
 function switchTab(tabId) {
-  const contents = document.querySelectorAll('.tab-content');
-  contents.forEach(el => el.classList.add('hidden'));
-
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('tab-active');
     btn.classList.add('tab-inactive');
   });
@@ -32,9 +24,91 @@ function switchTab(tabId) {
     activeBtn.classList.add('tab-active');
   }
 
-  // Re-render charts when switching tabs
   if (tabId === 'tab1' && chartVariety && chartRegional) {
     chartVariety.resize();
+    chartRegional.resize();
+  } else if (tabId === 'tab2' && chartHarvest) {
+    chartHarvest.resize();
+  }
+}
+
+function updateClock() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+  const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  const timeElem = document.getElementById('current-time-str');
+  const dateElem = document.getElementById('current-date-str');
+
+  if (timeElem) timeElem.innerText = timeStr;
+  if (dateElem) dateElem.innerText = dateStr;
+}
+
+// 2. Real-time Live Data Direct Update
+function updateLiveCardsDisplay(data) {
+  const setElemText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+
+  if (!data) return;
+
+  setElemText('live-temp', data.temp);
+  setElemText('disease-risk-desc', data.diseaseRisk);
+  setElemText('gistda-hotspot-count', data.hotspots);
+  setElemText('gistda-ndvi-status', data.ndvi);
+  setElemText('durian-price-grade-a', data.priceGradeA);
+  setElemText('cny-exchange-rate', data.cnyRate);
+  setElemText('border-status-title', data.borderStatus);
+  setElemText('border-status-desc', data.borderDesc);
+}
+
+function syncAllLiveData() {
+  const syncBtn = document.getElementById('btn-sync-live');
+  const syncBtnIcon = syncBtn ? syncBtn.querySelector('i') : null;
+  if (syncBtnIcon) syncBtnIcon.classList.add('animate-spin');
+
+  if (typeof fetchRealtimeData === 'function') {
+    fetchRealtimeData()
+      .then(data => {
+        updateLiveCardsDisplay(data);
+      })
+      .catch(err => {
+        console.error('Failed to sync live data:', err);
+        updateLiveCardsDisplay({
+          temp: 'Offline',
+          diseaseRisk: 'เชื่อมต่อ API ไม่สำเร็จ',
+          hotspots: 'Offline',
+          ndvi: 'ไม่พบสัญญาณดาวเทียม',
+          priceGradeA: 'Offline',
+          cnyRate: 'Offline',
+          borderStatus: 'Offline',
+          borderDesc: 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต'
+        });
+      })
+      .finally(() => {
+        if (syncBtnIcon) syncBtnIcon.classList.remove('animate-spin');
+      });
+  }
+}
+
+// 3. System Initialization
+function initApp() {
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  if (window.lucide) {
+    try { lucide.createIcons(); } catch (e) { console.warn(e); }
+  }
+
+  syncAllLiveData();
+}
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(initApp, 50);
+} else {
+  document.addEventListener('DOMContentLoaded', initApp);
+}    chartVariety.resize();
     chartRegional.resize();
   } else if (tabId === 'tab2' && chartHarvest) {
     chartHarvest.resize();
